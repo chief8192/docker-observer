@@ -106,10 +106,10 @@ class DockerEventThread(Thread):
         with self.lock:
             return self.running
 
-    def Pushover(self, message):
-        print(message)
+    def Pushover(self, title, message):
+        print(f"{title}. {message}")
         if self.pushover_enabled:
-            Push(self.pushover_user_key, self.pushover_app_token, message)
+            Push(self.pushover_user_key, self.pushover_app_token, message, title=title)
 
     def run(self):
         try:
@@ -148,21 +148,24 @@ class DockerEventThread(Thread):
                     # Process the event depending on what type it is.
                     if event_status in DOCKER_HEALTH_EVENTS:
                         self.Pushover(
-                            f"Container '{container_name}' has health changes: {event_substatus.upper()}"
+                            f"Container: {container_name}",
+                            f"Health: {event_substatus.upper()}",
                         )
 
                     elif event_status in DOCKER_LIFECYCLE_EVENTS:
                         self.Pushover(
-                            f"Container '{container_name}' has status changes: {event_status.upper()}"
+                            f"Container: {container_name}",
+                            f"Status: {event_status.upper()}",
                         )
 
                     else:
                         self.Pushover(
-                            f"Container '{container_name}' encountered an unsupported event: {event_status.upper()}"
+                            f"Container: {container_name}",
+                            f"Unsupported event: {event_status.upper()}",
                         )
 
         except Exception as e:
-            self.Pushover(f"{e.__class__.__name__}: {str(e)}")
+            self.Pushover("docker-observer", f"{e.__class__.__name__}: {str(e)}")
 
 
 def ExitHandler(event_thread, unused_signo, unused_stack_frame):
