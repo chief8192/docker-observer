@@ -34,7 +34,7 @@ $ sudo docker run \
     --name="docker-observer" \
     --network="host" \
     --restart="always" \
-    --volume="${PWD}/config.json:/config.json" \
+    --volume="${PWD}/config.json:/config.json:ro" \
     --volume="/var/run/docker.sock:/var/run/docker.sock" \
     "chief8192/docker-observer:latest"
 ```
